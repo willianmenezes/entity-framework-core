@@ -1,5 +1,7 @@
 ﻿using Learn_Entity_Core.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System;
 
 namespace Learn_Entity_Core.Data
 {
@@ -11,7 +13,10 @@ namespace Learn_Entity_Core.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = master; Integrated Security = True;");
+            optionsBuilder
+                .LogTo(x => Console.WriteLine(x)) // habilita os logs
+                .EnableSensitiveDataLogging() // mostra dados sensiveis das consulta (parametros)
+                .UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = master; Integrated Security = True;");
             base.OnConfiguring(optionsBuilder);
         }
 

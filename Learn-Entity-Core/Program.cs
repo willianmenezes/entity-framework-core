@@ -9,7 +9,7 @@ namespace Learn_Entity_Core
     {
         static void Main(string[] args)
         {
-            InserirDados();
+            InserirRegistrosEmMassa();
         }
 
         private static void InserirDados()
@@ -24,7 +24,7 @@ namespace Learn_Entity_Core
             };
 
             // adicionando pela propriedade que mapeamos no contexto
-            var db = new ApplicationContext();
+            using var db = new ApplicationContext();
             db.Produtos.Add(produto);
 
             //adicionando chamando o DbSet
@@ -37,6 +37,32 @@ namespace Learn_Entity_Core
             db.Add(produto);
 
             //salvando a entidade no banco de dados, antes so estava mapeados.
+            db.SaveChanges();
+        }
+
+        private static void InserirRegistrosEmMassa()
+        {
+            var produto = new Produto
+            {
+                Ativo = true,
+                CodigoDeBarras = "123",
+                Descricao = "Produto de testes",
+                TipoProduto = ValueObjects.TipoProduto.MercadoriaParaRevenda,
+                Valor = 100
+            };
+
+            var cliente = new Cliente
+            {
+                CEP = "14150000",
+                Cidade = "Serrana",
+                Estado = "SP",
+                Nome = "Willian",
+                Telefone = "16991324774"
+            };
+
+            using var db = new ApplicationContext();
+
+            db.AddRange(produto, cliente);
             db.SaveChanges();
         }
     }
