@@ -17,7 +17,11 @@ namespace Learn_Entity_Core.Data
             optionsBuilder
                 .LogTo(x => Console.WriteLine(x)) // habilita os logs
                 .EnableSensitiveDataLogging() // mostra dados sensiveis das consulta (parametros)
-                .UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = master; Integrated Security = True;");
+                .UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = master; Integrated Security = True;",
+                    p => p.EnableRetryOnFailure(
+                        maxRetryCount: 2,
+                        maxRetryDelay: TimeSpan.FromSeconds(5),
+                        errorNumbersToAdd: null).MigrationsHistoryTable("HistoricoMigracoes"));
             base.OnConfiguring(optionsBuilder);
         }
 
