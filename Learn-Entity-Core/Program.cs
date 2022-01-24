@@ -2,6 +2,8 @@
 using Learn_Entity_Core.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Learn_Entity_Core
 {
@@ -9,7 +11,7 @@ namespace Learn_Entity_Core
     {
         static void Main(string[] args)
         {
-            InserirRegistrosEmMassa();
+            ConsultaDePedidosComCarregamentoAdiantado();
         }
 
         private static void InserirDados()
@@ -64,6 +66,48 @@ namespace Learn_Entity_Core
 
             db.AddRange(produto, cliente);
             db.SaveChanges();
+        }
+
+        private static void CarregarDadosAdiantados()
+        {
+            using var db = new ApplicationContext();
+
+            var cliente = db.Clientes.FirstOrDefault();
+            var produto = db.Produtos.FirstOrDefault();
+
+            var pedido = new Pedido()
+            {
+                ClienteId = cliente.Id,
+                IniciadoEm = DateTime.Now,
+                FinalizadoEm = DateTime.Now,
+                Observacao = "Teste carregamento Adiantado",
+                Status = ValueObjects.StatusPedido.Analise,
+                TipoFrete = ValueObjects.TipoFrete.SemFrete,
+                Itens = new List<PedidoItem>()
+                {
+                    new PedidoItem()
+                    {
+                        Desconto = 0,
+                        ProdutoId = produto.Id,
+                        Quantidade = 10,
+                        Valor = 100,
+                    }
+                }
+            };
+
+            db.Pedidos.Add(pedido);
+            db.SaveChanges();
+        }
+
+        private static void ConsultaDePedidosComCarregamentoAdiantado()
+        {
+            using var db = new ApplicationContext();
+
+            var pedidos = db.Pedidos
+                .Include(p => p.Itens)
+                .ThenInclude(i => i.Produto)
+                .ToList();
+            Console.WriteLine(pedidos.Count);
         }
     }
 }
