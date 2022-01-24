@@ -11,7 +11,7 @@ namespace Learn_Entity_Core
     {
         static void Main(string[] args)
         {
-            ConsultaDePedidosComCarregamentoAdiantado();
+            AtualizandoDadosDesconectados();
         }
 
         private static void InserirDados()
@@ -108,6 +108,38 @@ namespace Learn_Entity_Core
                 .ThenInclude(i => i.Produto)
                 .ToList();
             Console.WriteLine(pedidos.Count);
+        }
+
+        private static void AtualizandoDadosMapeados()
+        {
+            using var db = new ApplicationContext();
+
+            var cliente = db.Clientes.FirstOrDefault();
+
+            cliente.Nome = "Willian Atualizado";
+
+            db.SaveChanges();
+        }
+
+        private static void AtualizandoDadosDesconectados()
+        {
+            using var db = new ApplicationContext();
+
+            var cliente = new Cliente
+            {
+                Id = 1,
+            };
+
+            var clienteDesconectado = new
+            {
+                Nome = "Willian Atualizado 123",
+                CEP = "14150231"
+            };
+
+            db.Attach(cliente);// adicionando ao tracking
+            db.Entry(cliente).CurrentValues.SetValues(clienteDesconectado);
+
+            db.SaveChanges();
         }
     }
 }
